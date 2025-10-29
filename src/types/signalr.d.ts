@@ -4,7 +4,7 @@ export interface Position {
   y: number;
 }
 
-// 🚗 Novo formato de rastreamento de veículos
+// Formato de rastreamento de veículos
 export interface VehiclePosition {
   x: number;              // Posição X (0-800)
   y: number;              // Posição Y (0-600)

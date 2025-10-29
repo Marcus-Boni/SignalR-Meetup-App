@@ -1,4 +1,3 @@
-// components/CarMap.tsx
 "use client";
 
 import { useState, useEffect, useRef } from "react";
@@ -6,15 +5,13 @@ import { useSignalRSubscription } from "../hooks/useSignalRSubscription";
 import { HUB_URLS } from "../context/SignalRProvider";
 import type { VehiclePosition } from "../types/signalr.d";
 
-// 🎨 Pontos de interesse da rota
 const WAYPOINTS = [
-  { x: 50, y: 550, name: "🏪 Depósito", color: "#10b981" },
-  { x: 250, y: 180, name: "🛒 Loja A", color: "#3b82f6" },
-  { x: 550, y: 350, name: "🏬 Loja B", color: "#f59e0b" },
-  { x: 350, y: 520, name: "🏢 Loja C", color: "#8b5cf6" },
+  { x: 50, y: 550, name: "🏪 Depósito", color: "#ff6b35" },
+  { x: 250, y: 180, name: "🛒 Loja A", color: "#e85a2a" },
+  { x: 550, y: 350, name: "🏬 Loja B", color: "#ff8c5a" },
+  { x: 350, y: 520, name: "🏢 Loja C", color: "#d04920" },
 ];
 
-// 🗺️ Rota otimizada (caminho das ruas)
 const ROUTE_POINTS = [
   [50, 550], [50, 250], [150, 180], [250, 180],
   [450, 180], [550, 250], [550, 450], [450, 520],
@@ -27,7 +24,6 @@ const CarMap = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const animationFrameRef = useRef<number | undefined>(undefined);
 
-  // 📡 Recebe atualizações do SignalR
   useSignalRSubscription<[VehiclePosition]>(
     HUB_URLS.tracking,
     "ReceivePosition",
@@ -35,15 +31,13 @@ const CarMap = () => {
       console.log("📍 Nova posição:", newPosition);
       setPosition(newPosition);
       
-      // Adiciona ao rastro
       setTrail(prev => {
         const newTrail = [...prev, { x: newPosition.x, y: newPosition.y, opacity: 1 }];
-        return newTrail.slice(-60); // Mantém últimos 60 pontos
+        return newTrail.slice(-60);
       });
     }
   );
 
-  // 🎨 Renderização do Canvas
   useEffect(() => {
     if (!canvasRef.current || !position) return;
 
@@ -52,25 +46,18 @@ const CarMap = () => {
     if (!ctx) return;
 
     const animate = () => {
-      // Limpa canvas
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-      // 1. Desenha fundo gradiente
       drawBackground(ctx, canvas.width, canvas.height);
 
-      // 2. Desenha grid
       drawGrid(ctx, canvas.width, canvas.height);
 
-      // 3. Desenha a rota
       drawRoute(ctx);
 
-      // 4. Desenha pontos de interesse
       drawWaypoints(ctx);
 
-      // 5. Desenha o rastro
       drawTrail(ctx, trail);
 
-      // 6. Desenha o veículo
       drawVehicle(ctx, position);
 
       animationFrameRef.current = requestAnimationFrame(animate);
@@ -87,9 +74,7 @@ const CarMap = () => {
 
   return (
     <div className="w-full max-w-5xl mx-auto p-2 sm:p-4 space-y-3 sm:space-y-4">
-      {/* 📊 Dashboard de Status */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-3">
-        {/* Status da Conexão */}
         <div className="bg-linear-to-br from-green-50 to-green-100 dark:from-green-900/20 dark:to-green-800/20 p-2 sm:p-3 rounded-lg shadow border border-green-200 dark:border-green-700">
           <div className="flex items-center gap-2">
             <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
@@ -102,20 +87,18 @@ const CarMap = () => {
           </div>
         </div>
 
-        {/* Velocidade */}
-        <div className="bg-linear-to-br from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-800/20 p-2 sm:p-3 rounded-lg shadow border border-blue-200 dark:border-blue-700">
+        <div className="bg-linear-to-br from-orange-50 to-orange-100 dark:from-orange-900/20 dark:to-orange-800/20 p-2 sm:p-3 rounded-lg shadow border-2 border-[#ff6b35]/30 dark:border-[#ff6b35]/50">
           <div className="flex items-center gap-2">
             <span className="text-lg sm:text-xl">🏁</span>
             <div className="flex-1 min-w-0">
-              <p className="text-[10px] sm:text-xs text-blue-600 dark:text-blue-400 font-medium">Velocidade</p>
-              <p className="text-xs sm:text-sm font-bold text-blue-700 dark:text-blue-300">
+              <p className="text-[10px] sm:text-xs text-[#e85a2a] dark:text-orange-400 font-medium">Velocidade</p>
+              <p className="text-xs sm:text-sm font-bold text-[#ff6b35] dark:text-orange-300">
                 {position ? `${Math.round(position.speed)} km/h` : "-- km/h"}
               </p>
             </div>
           </div>
         </div>
 
-        {/* Status do Veículo */}
         <div className={`bg-linear-to-br p-2 sm:p-3 rounded-lg shadow border ${getStatusStyle(position?.status)}`}>
           <div className="flex items-center gap-2">
             <span className="text-lg sm:text-xl">{getStatusIcon(position?.status)}</span>
@@ -128,13 +111,12 @@ const CarMap = () => {
           </div>
         </div>
 
-        {/* Progresso */}
-        <div className="bg-linear-to-br from-purple-50 to-purple-100 dark:from-purple-900/20 dark:to-purple-800/20 p-2 sm:p-3 rounded-lg shadow border border-purple-200 dark:border-purple-700">
+        <div className="bg-linear-to-br from-orange-50 to-orange-100 dark:from-orange-900/20 dark:to-orange-800/20 p-2 sm:p-3 rounded-lg shadow border-2 border-[#ff6b35]/30 dark:border-[#ff6b35]/50">
           <div className="flex items-center gap-2">
             <span className="text-lg sm:text-xl">📍</span>
             <div className="flex-1 min-w-0">
-              <p className="text-[10px] sm:text-xs text-purple-600 dark:text-purple-400 font-medium">Progresso</p>
-              <p className="text-xs sm:text-sm font-bold text-purple-700 dark:text-purple-300">
+              <p className="text-[10px] sm:text-xs text-[#e85a2a] dark:text-orange-400 font-medium">Progresso</p>
+              <p className="text-xs sm:text-sm font-bold text-[#ff6b35] dark:text-orange-300">
                 {position ? `${position.routeProgress}%` : "0%"}
               </p>
             </div>
@@ -142,11 +124,9 @@ const CarMap = () => {
         </div>
       </div>
 
-      {/* 🗺️ Mapa Principal */}
       <div className="relative">
-        <div className="absolute -inset-1 sm:-inset-2 bg-linear-to-r from-blue-500 via-purple-500 to-pink-500 rounded-xl sm:rounded-2xl opacity-20 blur-lg sm:blur-xl"></div>
-        <div className="relative bg-white dark:bg-gray-900 rounded-xl sm:rounded-2xl shadow-xl sm:shadow-2xl overflow-hidden border border-gray-200 dark:border-gray-700">
-          {/* Canvas Container com aspect ratio */}
+        <div className="absolute -inset-1 sm:-inset-2 bg-linear-to-r from-[#ff6b35] via-[#e85a2a] to-[#ff8c5a] rounded-xl sm:rounded-2xl opacity-20 blur-lg sm:blur-xl"></div>
+        <div className="relative bg-white dark:bg-gray-900 rounded-xl sm:rounded-2xl shadow-xl sm:shadow-2xl overflow-hidden border-2 border-[#ff6b35]/20 dark:border-[#ff6b35]/30">
           <div className="relative w-full" style={{ paddingBottom: '75%' }}>
             <canvas
               ref={canvasRef}
@@ -155,7 +135,6 @@ const CarMap = () => {
               className="absolute inset-0 w-full h-full"
             />
 
-            {/* 📊 Painel de Telemetria - Compacto */}
             {position && (
               <div className="absolute top-2 left-2 sm:top-3 sm:left-3 bg-black/75 backdrop-blur-sm text-white p-2 sm:p-3 rounded-lg shadow-xl border border-white/20 text-xs sm:text-sm max-w-[140px] sm:max-w-40">
                 <h3 className="font-bold text-xs sm:text-sm mb-1.5 sm:mb-2 flex items-center gap-1">
@@ -191,18 +170,17 @@ const CarMap = () => {
         </div>
       </div>
 
-      {/* 📈 Barra de Progresso da Rota - Compacta */}
       {position && (
-        <div className="bg-white dark:bg-gray-900 p-3 sm:p-4 rounded-lg sm:rounded-xl shadow-lg border border-gray-200 dark:border-gray-700">
+        <div className="bg-white dark:bg-gray-900 p-3 sm:p-4 rounded-lg sm:rounded-xl shadow-lg border-2 border-[#ff6b35]/20 dark:border-[#ff6b35]/30">
           <div className="flex items-center justify-between mb-2">
             <h4 className="font-bold text-sm sm:text-base text-gray-700 dark:text-gray-300">Progresso da Rota</h4>
-            <span className="text-lg sm:text-xl font-bold text-blue-600 dark:text-blue-400">
+            <span className="text-lg sm:text-xl font-bold text-[#ff6b35] dark:text-orange-400">
               {position.routeProgress}%
             </span>
           </div>
           <div className="relative w-full bg-gray-200 dark:bg-gray-700 rounded-full h-5 sm:h-6 overflow-hidden shadow-inner">
             <div
-              className="absolute top-0 left-0 h-full bg-linear-to-r from-blue-500 via-purple-500 to-pink-500 rounded-full transition-all duration-500 ease-out shadow-lg"
+              className="absolute top-0 left-0 h-full bg-linear-to-r from-[#ff6b35] via-[#e85a2a] to-[#ff8c5a] rounded-full transition-all duration-500 ease-out shadow-lg"
               style={{ width: `${position.routeProgress}%` }}
             >
               <div className="absolute inset-0 bg-white/30 animate-pulse"></div>
@@ -214,7 +192,6 @@ const CarMap = () => {
             </div>
           </div>
           
-          {/* Indicadores de Pontos de Interesse */}
           <div className="grid grid-cols-4 gap-1 mt-3 text-[10px] sm:text-xs">
             {WAYPOINTS.map((wp, idx) => (
               <div key={idx} className="text-center">
@@ -229,34 +206,31 @@ const CarMap = () => {
         </div>
       )}
 
-      {/* 🎯 Legenda - Compacta */}
-      <div className="bg-linear-to-r from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900 p-2 sm:p-3 rounded-lg border border-gray-200 dark:border-gray-700">
+      <div className="bg-linear-to-r from-orange-50 to-orange-100 dark:from-gray-800 dark:to-gray-900 p-2 sm:p-3 rounded-lg border-2 border-[#ff6b35]/30 dark:border-[#ff6b35]/50">
         <p className="text-center text-xs sm:text-sm text-gray-600 dark:text-gray-400">
-          <span className="font-bold text-blue-600 dark:text-blue-400">🚗 Rastreamento em Tempo Real</span>
-          <span className="hidden sm:inline"> • Sistema via SignalR</span>
+          <span className="font-bold text-[#ff6b35] dark:text-orange-400">🚗 Rastreamento em Tempo Real</span>
+          <span className="hidden sm:inline"> • Sistema via SignalR WebSocket</span>
         </p>
       </div>
     </div>
   );
 };
 
-// 🎨 Funções de Renderização Canvas
 function drawBackground(ctx: CanvasRenderingContext2D, width: number, height: number) {
-  // Gradiente de fundo
   const gradient = ctx.createLinearGradient(0, 0, width, height);
-  gradient.addColorStop(0, "#f0f9ff");
-  gradient.addColorStop(0.5, "#e0f2fe");
-  gradient.addColorStop(1, "#dbeafe");
+  gradient.addColorStop(0, "#fffbf5");    
+  gradient.addColorStop(0.3, "#fff8f0"); 
+  gradient.addColorStop(0.7, "#fff4eb");  
+  gradient.addColorStop(1, "#ffefe6");   
   ctx.fillStyle = gradient;
   ctx.fillRect(0, 0, width, height);
 }
 
 function drawGrid(ctx: CanvasRenderingContext2D, width: number, height: number) {
-  ctx.strokeStyle = "#cbd5e1";
-  ctx.lineWidth = 0.5;
-  ctx.globalAlpha = 0.3;
+  ctx.strokeStyle = "#ffe4d6";
+  ctx.lineWidth = 0.8;
+  ctx.globalAlpha = 0.4;
 
-  // Linhas verticais
   for (let x = 0; x < width; x += 40) {
     ctx.beginPath();
     ctx.moveTo(x, 0);
@@ -264,7 +238,6 @@ function drawGrid(ctx: CanvasRenderingContext2D, width: number, height: number) 
     ctx.stroke();
   }
 
-  // Linhas horizontais
   for (let y = 0; y < height; y += 40) {
     ctx.beginPath();
     ctx.moveTo(0, y);
@@ -276,15 +249,13 @@ function drawGrid(ctx: CanvasRenderingContext2D, width: number, height: number) 
 }
 
 function drawRoute(ctx: CanvasRenderingContext2D) {
-  // Sombra da rota
-  ctx.shadowColor = "rgba(0, 0, 0, 0.2)";
-  ctx.shadowBlur = 10;
+  ctx.shadowColor = "rgba(255, 107, 53, 0.15)";
+  ctx.shadowBlur = 8;
   ctx.shadowOffsetX = 2;
   ctx.shadowOffsetY = 2;
 
-  // Rota principal
-  ctx.strokeStyle = "#94a3b8";
-  ctx.lineWidth = 8;
+  ctx.strokeStyle = "#a89f94";
+  ctx.lineWidth = 10;
   ctx.lineCap = "round";
   ctx.lineJoin = "round";
   ctx.beginPath();
@@ -295,10 +266,9 @@ function drawRoute(ctx: CanvasRenderingContext2D) {
   }
   ctx.stroke();
 
-  // Linha tracejada no centro
   ctx.shadowColor = "transparent";
-  ctx.strokeStyle = "#ffffff";
-  ctx.lineWidth = 2;
+  ctx.strokeStyle = "#fff8f0";
+  ctx.lineWidth = 2.5;
   ctx.setLineDash([15, 10]);
   ctx.beginPath();
   
@@ -312,40 +282,34 @@ function drawRoute(ctx: CanvasRenderingContext2D) {
 
 function drawWaypoints(ctx: CanvasRenderingContext2D) {
   WAYPOINTS.forEach((wp, index) => {
-    // Sombra do marcador
-    ctx.shadowColor = "rgba(0, 0, 0, 0.3)";
-    ctx.shadowBlur = 6;
+    ctx.shadowColor = "rgba(255, 107, 53, 0.25)";
+    ctx.shadowBlur = 8;
     ctx.shadowOffsetX = 2;
     ctx.shadowOffsetY = 2;
 
-    // Círculo externo (borda)
-    ctx.fillStyle = "#ffffff";
+    ctx.fillStyle = "#fffbf5";
     ctx.beginPath();
-    ctx.arc(wp.x, wp.y, 10, 0, Math.PI * 2);
+    ctx.arc(wp.x, wp.y, 11, 0, Math.PI * 2);
     ctx.fill();
 
-    // Círculo interno (cor do ponto)
     ctx.fillStyle = wp.color;
     ctx.beginPath();
-    ctx.arc(wp.x, wp.y, 7, 0, Math.PI * 2);
+    ctx.arc(wp.x, wp.y, 8, 0, Math.PI * 2);
     ctx.fill();
 
-    // Número do ponto
     ctx.shadowColor = "transparent";
     ctx.fillStyle = "#ffffff";
-    ctx.font = "bold 9px Arial";
+    ctx.font = "bold 10px Arial";
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
     ctx.fillText((index + 1).toString(), wp.x, wp.y);
 
-    // Label do ponto - somente emoji em telas menores
-    ctx.shadowColor = "rgba(0, 0, 0, 0.5)";
-    ctx.shadowBlur = 3;
-    ctx.fillStyle = "#1f2937";
-    ctx.font = "bold 11px Arial";
+    ctx.shadowColor = "rgba(232, 90, 42, 0.4)";
+    ctx.shadowBlur = 4;
+    ctx.fillStyle = "#4a4a4a";  
+    ctx.font = "bold 12px Arial";
     ctx.textAlign = "center";
-    // Mostra apenas o emoji (primeiro caractere)
-    ctx.fillText(wp.name.split(' ')[0], wp.x, wp.y - 18);
+    ctx.fillText(wp.name.split(' ')[0], wp.x, wp.y - 20);
   });
 
   ctx.shadowColor = "transparent";
@@ -358,7 +322,7 @@ function drawTrail(ctx: CanvasRenderingContext2D, trail: Array<{ x: number; y: n
     const opacity = (index / trail.length) * 0.4;
     const size = 2 + (index / trail.length) * 2;
     
-    ctx.fillStyle = `rgba(59, 130, 246, ${opacity})`;
+    ctx.fillStyle = `rgba(255, 107, 53, ${opacity})`;
     ctx.beginPath();
     ctx.arc(point.x, point.y, size, 0, Math.PI * 2);
     ctx.fill();
@@ -371,52 +335,48 @@ function drawVehicle(ctx: CanvasRenderingContext2D, position: VehiclePosition) {
   ctx.translate(position.x, position.y);
   ctx.rotate((position.heading * Math.PI) / 180);
 
-  // Sombra do veículo
-  ctx.shadowColor = "rgba(0, 0, 0, 0.4)";
-  ctx.shadowBlur = 12;
-  ctx.shadowOffsetX = 2;
-  ctx.shadowOffsetY = 2;
+  ctx.shadowColor = "rgba(255, 107, 53, 0.35)";
+  ctx.shadowBlur = 14;
+  ctx.shadowOffsetX = 3;
+  ctx.shadowOffsetY = 3;
 
-  // Corpo do veículo (círculo principal)
   const vehicleColor = getVehicleColor(position.status);
   ctx.fillStyle = vehicleColor;
   ctx.beginPath();
-  ctx.arc(0, 0, 12, 0, Math.PI * 2);
+  ctx.arc(0, 0, 13, 0, Math.PI * 2);
   ctx.fill();
 
-  // Borda do veículo
-  ctx.strokeStyle = "#ffffff";
-  ctx.lineWidth = 2;
+  ctx.strokeStyle = "#fffbf5";
+  ctx.lineWidth = 2.5;
   ctx.stroke();
 
   ctx.shadowColor = "transparent";
 
-  // Indicador de direção (seta)
-  ctx.fillStyle = "#ffffff";
+  ctx.fillStyle = "#fffbf5";
   ctx.beginPath();
-  ctx.moveTo(14, 0);
-  ctx.lineTo(-5, -7);
-  ctx.lineTo(-5, 7);
+  ctx.moveTo(16, 0);
+  ctx.lineTo(-6, -8);
+  ctx.lineTo(-6, 8);
   ctx.closePath();
   ctx.fill();
 
-  // Velocímetro acima do veículo
-  ctx.fillStyle = "#1f2937";
-  ctx.font = "bold 10px Arial";
+  ctx.shadowColor = "rgba(255, 255, 255, 0.8)";
+  ctx.shadowBlur = 3;
+  ctx.fillStyle = "#2a2a2a";
+  ctx.font = "bold 11px Arial";
   ctx.textAlign = "center";
-  ctx.fillText(`${Math.round(position.speed)} km/h`, 0, -22);
+  ctx.fillText(`${Math.round(position.speed)} km/h`, 0, -24);
 
   ctx.restore();
 }
 
-// 🎨 Funções auxiliares de estilo
 function getVehicleColor(status?: string): string {
   switch (status) {
-    case "Moving": return "#3b82f6";      // Azul
-    case "Stopped": return "#ef4444";     // Vermelho
-    case "Accelerating": return "#10b981"; // Verde
-    case "Braking": return "#f59e0b";      // Amarelo
-    default: return "#6b7280";             // Cinza
+    case "Moving": return "#ff6b35";   
+    case "Stopped": return "#ef4444";   
+    case "Accelerating": return "#10b981"; 
+    case "Braking": return "#f59e0b";   
+    default: return "#6b7280";          
   }
 }
 

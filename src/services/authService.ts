@@ -101,7 +101,6 @@ class AuthService {
       localStorage.removeItem(this.TOKEN_KEY);
       localStorage.removeItem(this.USERNAME_KEY);
       
-      // Remove cookie do token
       document.cookie = `${this.TOKEN_KEY}=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT`;
     }
   }
@@ -124,8 +123,6 @@ class AuthService {
     if (typeof window !== 'undefined') {
       localStorage.setItem(this.TOKEN_KEY, token);
       
-      // Também salva em cookie para o middleware poder acessar
-      // Cookie expira em 7 dias
       const expiryDate = new Date();
       expiryDate.setDate(expiryDate.getDate() + 7);
       document.cookie = `${this.TOKEN_KEY}=${token}; path=/; expires=${expiryDate.toUTCString()}; SameSite=Strict`;

@@ -18,7 +18,6 @@ export default function ProtectedRoute({ children }: { children: React.ReactNode
       if (!token) {
         console.log('❌ Sem token, redirecionando para login');
         if (isMounted) {
-          // Usa window.location.href para garantir redirecionamento completo
           window.location.href = '/login';
         }
         return;
@@ -54,7 +53,7 @@ export default function ProtectedRoute({ children }: { children: React.ReactNode
     return () => {
       isMounted = false;
     };
-  }, [pathname]); // Adiciona pathname como dependência
+  }, [pathname]);  
 
   if (isChecking) {
     return (

@@ -1,29 +1,25 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef } from "react";
 import { useSignalRSubscription } from "../../hooks/useSignalRSubscription";
 import { useSignalRInvoke } from "../../hooks/useSignalRInvoke";
 import { HUB_URLS } from "../../context/SignalRProvider";
 import { useAuth } from "../../hooks/useAuth";
 import type { ChatMessage } from "../../types/signalr.d";
+import { MessageCircle, Send, LogIn, LogOut, Lightbulb, Users, Mail } from "lucide-react";
 
 export default function ChatPage() {
-  // Obtém o username real do JWT
   const { username: loggedUsername } = useAuth();
   
-  // Estados
   const [roomName, setRoomName] = useState("");
   const [currentRoom, setCurrentRoom] = useState<string | null>(null);
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState<ChatMessage[]>([]);
 
-  // Ref para auto-scroll
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  // Hook para invocar métodos no servidor
   const invoke = useSignalRInvoke(HUB_URLS.chat);
 
-  // Inscrição para receber mensagens
   useSignalRSubscription<[ChatMessage]>(
     HUB_URLS.chat,
     "ReceiveMessage",
@@ -33,12 +29,6 @@ export default function ChatPage() {
     }
   );
 
-  // Auto-scroll para a última mensagem
-  useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages]);
-
-  // Handler: Entrar na sala
   const handleJoinRoom = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!roomName.trim()) return;
@@ -47,17 +37,15 @@ export default function ChatPage() {
       console.log('🚪 Tentando entrar na sala...');
       console.log('  📍 Nome da sala:', roomName.trim());
       
-      // Se já está em uma sala, sair dela primeiro
       if (currentRoom) {
         console.log('  🚶 Saindo da sala anterior:', currentRoom);
         await invoke("LeaveRoom", currentRoom);
-        setMessages([]); // Limpa as mensagens da sala anterior
+        setMessages([]); 
       }
 
-      // Entrar na nova sala
       await invoke("JoinRoom", roomName.trim());
       setCurrentRoom(roomName.trim());
-      setRoomName(""); // Limpa o input
+      setRoomName(""); 
       
       console.log('✅ Entrou na sala com sucesso!');
     } catch (error) {
@@ -66,7 +54,6 @@ export default function ChatPage() {
     }
   };
 
-  // Handler: Sair da sala
   const handleLeaveRoom = async () => {
     if (!currentRoom) return;
 
@@ -81,7 +68,6 @@ export default function ChatPage() {
     }
   };
 
-  // Handler: Enviar mensagem
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!message.trim() || !currentRoom) return;
@@ -91,11 +77,9 @@ export default function ChatPage() {
       console.log('  📍 Sala:', currentRoom);
       console.log('  💬 Mensagem:', message.trim());
       
-      // ✅ CORRETO: SendMessage espera apenas 2 parâmetros (roomName, message)
-      // O username vem automaticamente do token JWT no backend
       await invoke("SendMessage", currentRoom, message.trim());
       
-      setMessage(""); // Limpa o input
+      setMessage("");
       console.log('✅ Mensagem enviada com sucesso!');
     } catch (error) {
       console.error("❌ Erro ao enviar mensagem:", error);
@@ -103,23 +87,31 @@ export default function ChatPage() {
     }
   };
 
-  // Interface principal do Chat
   return (
-    <main className="min-h-screen bg-background p-8">
+    <main className="min-h-screen dark:from-gray-900 dark:to-gray-800 p-8">
       <div className="max-w-5xl mx-auto">
-        {/* Header */}
         <div className="text-center mb-6">
-          <h1 className="text-3xl font-bold">💬 Chat Multi-Sala</h1>
-          <p className="text-sm text-gray-600 dark:text-gray-400">
-            Logado como: <span className="font-semibold">{loggedUsername || "Carregando..."}</span>
+          <div className="flex items-center justify-center mb-4">
+            <div className="bg-linear-to-br from-[#ff6b35] to-[#e85a2a] rounded-2xl p-3 shadow-xl">
+              <MessageCircle className="w-10 h-10 text-white" />
+            </div>
+          </div>
+          <h1 className="text-4xl font-bold bg-linear-to-r from-[#ff6b35] to-[#e85a2a] bg-clip-text text-transparent mb-2">
+            Chat Multi-Sala
+          </h1>
+          <p className="text-sm text-gray-600 dark:text-gray-400 flex items-center justify-center gap-2">
+            <Users className="w-4 h-4" />
+            Logado como: <span className="font-semibold text-[#ff6b35]">{loggedUsername || "Carregando..."}</span>
           </p>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Sidebar: Controle de Salas */}
           <div className="lg:col-span-1">
-            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
-              <h2 className="text-xl font-bold mb-4">🚪 Salas</h2>
+            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-2xl p-6 border-2 border-[#ff6b35]/20">
+              <div className="flex items-center gap-2 mb-4">
+                <Users className="w-5 h-5 text-[#ff6b35]" />
+                <h2 className="text-xl font-bold">Salas</h2>
+              </div>
 
               {!currentRoom ? (
                 <form onSubmit={handleJoinRoom}>
@@ -141,35 +133,40 @@ export default function ChatPage() {
                   </div>
                   <button
                     type="submit"
-                    className="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-2 rounded-lg transition-colors disabled:opacity-50"
+                    className="w-full bg-linear-to-r from-[#ff6b35] to-[#e85a2a] hover:from-[#e85a2a] hover:to-[#d04920] text-white font-semibold py-2 rounded-lg transition-all shadow-lg disabled:opacity-50 flex items-center justify-center gap-2"
                     disabled={!roomName.trim()}
                   >
+                    <LogIn className="w-4 h-4" />
                     Entrar na Sala
                   </button>
                 </form>
               ) : (
                 <div>
-                  <div className="bg-green-100 dark:bg-green-900/30 border border-green-500 rounded-lg p-4 mb-4">
-                    <p className="text-sm font-medium text-green-800 dark:text-green-200 mb-1">
+                  <div className="bg-orange-50 dark:bg-orange-900/20 border-2 border-[#ff6b35] rounded-lg p-4 mb-4">
+                    <p className="text-sm font-medium text-[#e85a2a] dark:text-orange-300 mb-1">
                       Sala Atual
                     </p>
-                    <p className="text-lg font-bold text-green-900 dark:text-green-100">
+                    <p className="text-lg font-bold text-[#ff6b35] dark:text-orange-200">
                       {currentRoom}
                     </p>
                   </div>
                   <button
                     onClick={handleLeaveRoom}
-                    className="w-full bg-red-600 hover:bg-red-700 text-white font-semibold py-2 rounded-lg transition-colors"
+                    className="w-full bg-red-600 hover:bg-red-700 text-white font-semibold py-2 rounded-lg transition-colors flex items-center justify-center gap-2 shadow-lg"
                   >
+                    <LogOut className="w-4 h-4" />
                     Sair da Sala
                   </button>
                 </div>
               )}
 
               <div className="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
-                <h3 className="text-sm font-semibold mb-2 text-gray-600 dark:text-gray-400">
-                  💡 Dicas
-                </h3>
+                <div className="flex items-center gap-2 mb-2">
+                  <Lightbulb className="w-4 h-4 text-[#ff6b35]" />
+                  <h3 className="text-sm font-semibold text-gray-600 dark:text-gray-400">
+                    Dicas
+                  </h3>
+                </div>
                 <ul className="text-xs text-gray-600 dark:text-gray-400 space-y-1">
                   <li>• Abra em múltiplas abas</li>
                   <li>• Entre na mesma sala</li>
@@ -179,28 +176,25 @@ export default function ChatPage() {
             </div>
           </div>
 
-          {/* Área Principal: Chat */}
           <div className="lg:col-span-2">
-            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg flex flex-col h-[600px]">
-              {/* Área de Mensagens */}
+            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-2xl flex flex-col h-[600px] border-2 border-[#ff6b35]/20">
               <div className="flex-1 overflow-y-auto p-6 space-y-3">
                 {!currentRoom ? (
                   <div className="flex items-center justify-center h-full text-gray-400">
                     <div className="text-center">
-                      <div className="text-6xl mb-4">👈</div>
+                      <LogIn className="w-16 h-16 mx-auto mb-4 text-[#ff6b35]" />
                       <p className="text-lg">Entre em uma sala para começar a conversar</p>
                     </div>
                   </div>
                 ) : messages.length === 0 ? (
                   <div className="flex items-center justify-center h-full text-gray-400">
                     <div className="text-center">
-                      <div className="text-6xl mb-4">📭</div>
+                      <Mail className="w-16 h-16 mx-auto mb-4 text-[#ff6b35]" />
                       <p>Nenhuma mensagem ainda. Seja o primeiro a falar!</p>
                     </div>
                   </div>
                 ) : (
                   messages.map((msg, index) => {
-                    // Compara com o username do JWT
                     const isOwnMessage = msg.user === loggedUsername;
                     return (
                       <div
@@ -208,9 +202,9 @@ export default function ChatPage() {
                         className={`flex ${isOwnMessage ? "justify-end" : "justify-start"}`}
                       >
                         <div
-                          className={`max-w-xs lg:max-w-md px-4 py-2 rounded-lg ${
+                          className={`max-w-xs lg:max-w-md px-4 py-2 rounded-lg shadow-md ${
                             isOwnMessage
-                              ? "bg-blue-600 text-white"
+                              ? "bg-linear-to-r from-[#ff6b35] to-[#e85a2a] text-white"
                               : "bg-gray-200 dark:bg-gray-700"
                           }`}
                         >
@@ -226,7 +220,6 @@ export default function ChatPage() {
                 <div ref={messagesEndRef} />
               </div>
 
-              {/* Input de Mensagem */}
               {currentRoom && (
                 <form
                   onSubmit={handleSendMessage}
@@ -243,9 +236,10 @@ export default function ChatPage() {
                     />
                     <button
                       type="submit"
-                      className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-2 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="bg-linear-to-r from-[#ff6b35] to-[#e85a2a] hover:from-[#e85a2a] hover:to-[#d04920] text-white font-semibold px-6 py-2 rounded-lg transition-all shadow-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
                       disabled={!message.trim()}
                     >
+                      <Send className="w-4 h-4" />
                       Enviar
                     </button>
                   </div>

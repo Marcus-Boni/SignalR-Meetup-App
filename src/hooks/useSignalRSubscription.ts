@@ -21,11 +21,8 @@ export const useSignalRSubscription = <T extends unknown[]>(
 ) => {
   const { getConnection } = useSignalRContext();
   
-  // Usa useRef para manter a referência estável do callback
-  // Isso evita re-registrar o evento a cada render
   const callbackRef = useRef(callback);
 
-  // Atualiza a ref sempre que o callback mudar
   useEffect(() => {
     callbackRef.current = callback;
   }, [callback]);
@@ -38,27 +35,21 @@ export const useSignalRSubscription = <T extends unknown[]>(
       return;
     }
 
-    // Wrapper que usa a ref, garantindo que sempre usa a versão mais recente
     const eventHandler = (...args: T) => {
       callbackRef.current(...args);
     };
 
-    // Função para registrar o evento
     const registerEvent = () => {
-      // Remove listener anterior se existir (cleanup)
       connection.off(eventName, eventHandler);
       
-      // Registra o listener
       connection.on(eventName, eventHandler);
       console.log(`👂 Inscrito no evento "${eventName}" do ${hubUrl}`);
     };
 
-    // Se a conexão já está conectada, registra imediatamente
     if (connection.state === HubConnectionState.Connected) {
       registerEvent();
     }
 
-    // Também registra quando a conexão for estabelecida (para casos de reconexão)
     const onReconnected = () => {
       console.log(`🔄 Reconectado - Re-registrando evento "${eventName}"`);
       registerEvent();
@@ -66,10 +57,8 @@ export const useSignalRSubscription = <T extends unknown[]>(
 
     connection.onreconnected(onReconnected);
 
-    // Tenta registrar imediatamente (caso a conexão esteja em processo)
     registerEvent();
 
-    // CRÍTICO: Função de limpeza para evitar memory leaks
     return () => {
       connection.off(eventName, eventHandler);
       console.log(`🚫 Desinscrito do evento "${eventName}" do ${hubUrl}`);

@@ -32,7 +32,6 @@ export function useAuth() {
     setIsAuthenticated(false);
     setUsername(null);
     
-    // Usa window.location para garantir logout completo e limpar estado
     window.location.href = '/login';
   };
 

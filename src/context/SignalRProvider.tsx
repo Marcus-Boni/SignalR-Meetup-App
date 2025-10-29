@@ -4,16 +4,13 @@ import { createContext, useContext, useEffect, useRef, useState, ReactNode } fro
 import { authService } from "../services/authService";
 import * as signalR from "@microsoft/signalr";
 
-// Tipo do contexto
 interface SignalRContextValue {
   getConnection: (hubUrl: string) => signalR.HubConnection | undefined;
-  isReady: boolean; // Novo: indica se as conexões estão prontas
+  isReady: boolean; 
 }
 
-// Criação do Contexto
 const SignalRContext = createContext<SignalRContextValue | undefined>(undefined);
 
-// Hook para acessar o contexto
 export const useSignalRContext = () => {
   const context = useContext(SignalRContext);
   if (!context) {
@@ -22,17 +19,13 @@ export const useSignalRContext = () => {
   return context;
 };
 
-// Configuração dos Hubs
 const HUB_URLS = {
   tracking: "https://localhost:7279/trackingHub",
   chat: "https://localhost:7279/chatHub",
   payment: "https://localhost:7279/paymentHub",
 } as const;
 
-// Função simulada para obter o token JWT
-// Em produção, isso viria de um serviço de autenticação
 const getAccessToken = (): string => {
-  // Usa o token real do authService
   return authService.getToken() || "";
 };
 
@@ -41,19 +34,16 @@ interface SignalRProviderProps {
 }
 
 export const SignalRProvider: React.FC<SignalRProviderProps> = ({ children }) => {
-  // Armazena as conexões em um Map (hubUrl -> HubConnection)
   const connectionsRef = useRef<Map<string, signalR.HubConnection>>(new Map());
   const isInitializedRef = useRef(false);
   const [isReady, setIsReady] = useState(false);
 
   useEffect(() => {
-    // Previne dupla inicialização (React Strict Mode)
     if (isInitializedRef.current) return;
     isInitializedRef.current = true;
 
     const connections = connectionsRef.current;
 
-    // Função para criar e iniciar uma conexão
     const createConnection = async (hubUrl: string) => {
       try {
         const connection = new signalR.HubConnectionBuilder()
@@ -64,18 +54,16 @@ export const SignalRProvider: React.FC<SignalRProviderProps> = ({ children }) =>
           })
           .withAutomaticReconnect({
             nextRetryDelayInMilliseconds: (retryContext) => {
-              // Estratégia de retry exponencial
               if (retryContext.elapsedMilliseconds < 60000) {
                 return Math.random() * 10000;
               } else {
-                return null; // Para de tentar após 1 minuto
+                return null; 
               }
             },
           })
           .configureLogging(signalR.LogLevel.Information)
           .build();
 
-        // Event handlers para o ciclo de vida da conexão
         connection.onreconnecting((error) => {
           console.warn(`🔄 Reconectando ao ${hubUrl}...`, error);
         });
@@ -88,19 +76,15 @@ export const SignalRProvider: React.FC<SignalRProviderProps> = ({ children }) =>
           console.error(`❌ Conexão fechada: ${hubUrl}`, error);
         });
 
-        // Inicia a conexão
         await connection.start();
         console.log(`🚀 Conectado ao ${hubUrl}`);
 
-        // Armazena a conexão no Map
         connections.set(hubUrl, connection);
       } catch (error) {
         console.error(`❌ Erro ao conectar no ${hubUrl}:`, error);
-        // Em produção, você pode querer implementar retry manual aqui
       }
     };
 
-    // Cria conexões para todos os Hubs
     const initializeConnections = async () => {
       await Promise.all([
         createConnection(HUB_URLS.tracking),
@@ -108,14 +92,12 @@ export const SignalRProvider: React.FC<SignalRProviderProps> = ({ children }) =>
         createConnection(HUB_URLS.payment),
       ]);
       
-      // Marca como pronto após todas as conexões serem estabelecidas
       setIsReady(true);
       console.log("✅ Todas as conexões SignalR estão prontas!");
     };
 
     initializeConnections();
 
-    // Cleanup: Para todas as conexões quando o Provider é desmontado
     return () => {
       console.log("🧹 Limpando conexões SignalR...");
       connections.forEach((connection, hubUrl) => {
@@ -128,7 +110,6 @@ export const SignalRProvider: React.FC<SignalRProviderProps> = ({ children }) =>
     };
   }, []);
 
-  // Método para obter uma conexão específica
   const getConnection = (hubUrl: string): signalR.HubConnection | undefined => {
     return connectionsRef.current.get(hubUrl);
   };
@@ -145,5 +126,4 @@ export const SignalRProvider: React.FC<SignalRProviderProps> = ({ children }) =>
   );
 };
 
-// Exporta as URLs dos Hubs para uso nos hooks
 export { HUB_URLS };

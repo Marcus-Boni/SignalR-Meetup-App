@@ -13,8 +13,14 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "SignalR Real-Time App",
-  description: "Aplicação de demonstração com SignalR e Next.js",
+  title: "Websockets com SignalR | Meetup Optsolv",
+  description: "Demonstração de comunicação em tempo real com .NET SignalR + Next.js - Meetup Optsolv",
+  openGraph: {
+    title: "Websockets. Uma abordagem com SignalR",
+    description: "Demonstração de comunicação em tempo real com .NET SignalR + Next.js",
+    type: "website",
+    locale: "pt_BR",
+  },
 };
 
 export default function RootLayout({

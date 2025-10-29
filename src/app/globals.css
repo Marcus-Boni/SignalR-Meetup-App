@@ -1,8 +1,24 @@
 @import "tailwindcss";
 
 :root {
+  /* Optsolv Orange Theme */
   --background: #ffffff;
-  --foreground: #171717;
+  --foreground: #1a1a1a;
+
+  /* Optsolv Brand Colors */
+  --optsolv-orange: #ff6b35;
+  --optsolv-orange-light: #ff8c5a;
+  --optsolv-orange-dark: #e85a2a;
+  --optsolv-dark: #1a1a1a;
+  --optsolv-gray: #4a4a4a;
+
+  /* Accent Colors */
+  --accent-primary: #ff6b35;
+  --accent-secondary: #2a2a2a;
+  --accent-success: #10b981;
+  --accent-warning: #f59e0b;
+  --accent-error: #ef4444;
+  --accent-info: #3b82f6;
 }
 
 @theme inline {
@@ -10,11 +26,18 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+
+  /* Optsolv Custom Colors */
+  --color-optsolv-orange: var(--optsolv-orange);
+  --color-optsolv-orange-light: var(--optsolv-orange-light);
+  --color-optsolv-orange-dark: var(--optsolv-orange-dark);
+  --color-optsolv-dark: var(--optsolv-dark);
+  --color-optsolv-gray: var(--optsolv-gray);
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
+    --background: #0f0f0f;
     --foreground: #ededed;
   }
 }
@@ -22,5 +45,34 @@
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
+    "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Custom Scrollbar - Optsolv Theme */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--optsolv-orange);
+  border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--optsolv-orange-dark);
+}
+
+@media (prefers-color-scheme: dark) {
+  ::-webkit-scrollbar-track {
+    background: #2a2a2a;
+  }
 }
