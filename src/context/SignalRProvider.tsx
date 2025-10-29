@@ -19,10 +19,12 @@ export const useSignalRContext = () => {
   return context;
 };
 
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://localhost:7279';
+
 const HUB_URLS = {
-  tracking: "https://localhost:7279/trackingHub",
-  chat: "https://localhost:7279/chatHub",
-  payment: "https://localhost:7279/paymentHub",
+  tracking: `${API_BASE_URL}/trackingHub`,
+  chat: `${API_BASE_URL}/chatHub`,
+  payment: `${API_BASE_URL}/paymentHub`,
 } as const;
 
 const getAccessToken = (): string => {

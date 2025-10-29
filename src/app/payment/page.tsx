@@ -8,6 +8,8 @@ import type { PaymentStatus, PaymentRequest } from "../../types/signalr.d";
 import { authService } from "../../services/authService";
 import { CreditCard, DollarSign, CheckCircle, XCircle, Clock, Loader2, RefreshCw, Info } from "lucide-react";
 
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://localhost:7279';
+
 const generateOrderId = (): string => {
   return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, (c) => {
     const r = (Math.random() * 16) | 0;
@@ -55,7 +57,7 @@ export default function PaymentPage() {
         amount: parseFloat(amount),
       };
 
-      const response = await fetch("https://localhost:7279/api/payments/pay", {
+      const response = await fetch(`${API_BASE_URL}/api/payments/pay`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
