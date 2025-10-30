@@ -1,6 +1,6 @@
 # 🚀 SignalR Real-Time Application
 
-Uma aplicação **enterprise-grade** de demonstração que implementa comunicação em tempo real usando **.NET SignalR** e **Next.js 14** (App Router) com **TypeScript**.
+Uma aplicação **enterprise-grade** de demonstração que implementa comunicação em tempo real usando **.NET SignalR** e **Next.js 16** (App Router) com **TypeScript**.
 
 ![Next.js](https://img.shields.io/badge/Next.js-16.0.0-black)
 ![React](https://img.shields.io/badge/React-19.2.0-blue)
@@ -87,17 +87,6 @@ Abra [http://localhost:3000](http://localhost:3000) no navegador.
 
 ---
 
-## 📖 Documentação Completa
-
-Este projeto inclui documentação extensiva:
-
-- **[ARCHITECTURE.md](./ARCHITECTURE.md)** - Arquitetura detalhada, decisões técnicas e fluxos
-- **[QUICKSTART.md](./QUICKSTART.md)** - Guia rápido de uso e testes
-- **[BACKEND_CONTRACT.md](./BACKEND_CONTRACT.md)** - Contratos esperados do backend .NET
-- **[EXECUTIVE_SUMMARY.md](./EXECUTIVE_SUMMARY.md)** - Sumário executivo da implementação
-
----
-
 ## 🎯 Funcionalidades Detalhadas
 
 ### 1. Car Tracking (`/`)
@@ -136,11 +125,10 @@ useSignalRSubscription<[ChatMessage]>(
 ```
 
 **Testes:**
-1. Defina um username
-2. Entre em uma sala
-3. Abra em outra aba com username diferente
-4. Entre na mesma sala
-5. Envie mensagens e veja a sincronização
+1. Entre em uma sala
+2. Abra em outra aba com username diferente
+3. Entre na mesma sala
+4. Envie mensagens e veja a sincronização
 
 ---
 
@@ -190,28 +178,6 @@ useSignalRSubscription<[PaymentStatus]>(
 - **React Context API** - Estado global
 - **Custom Hooks** - Lógica reutilizável
 - **TypeScript Generics** - Type-safe abstractions
-
----
-
-## 🔐 Segurança
-
-### Autenticação
-Atualmente usa um token JWT simulado:
-
-```typescript
-const getAccessToken = (): string => {
-  return "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...";
-};
-```
-
-**⚠️ Em produção, substitua por autenticação real:**
-
-```typescript
-const getAccessToken = async (): Promise<string> => {
-  const token = await authService.getToken();
-  return token;
-};
-```
 
 ---
 
@@ -278,31 +244,6 @@ npm run build
 
 ---
 
-## 🌐 Deploy
-
-### Vercel (Recomendado)
-
-```bash
-# Instalar Vercel CLI
-npm i -g vercel
-
-# Deploy
-vercel
-```
-
-### Variáveis de Ambiente
-
-Crie `.env.production`:
-
-```env
-NEXT_PUBLIC_TRACKING_HUB_URL=https://api.prod.com/trackingHub
-NEXT_PUBLIC_CHAT_HUB_URL=https://api.prod.com/chatHub
-NEXT_PUBLIC_PAYMENT_HUB_URL=https://api.prod.com/paymentHub
-NEXT_PUBLIC_PAYMENT_API_URL=https://api.prod.com/api/payments
-```
-
----
-
 ## 🤝 Contribuindo
 
 Este é um projeto de demonstração, mas sugestões são bem-vindas!
@@ -320,25 +261,4 @@ Este é um projeto de demonstração, mas sugestões são bem-vindas!
 MIT License - veja o arquivo [LICENSE](LICENSE) para detalhes.
 
 ---
-
-## 🙏 Agradecimentos
-
-- **Next.js Team** - Pelo excelente framework
-- **Microsoft SignalR** - Pela biblioteca robusta de real-time
-- **Tailwind CSS** - Pelo sistema de design eficiente
-
----
-
-## 📞 Suporte
-
-Para dúvidas sobre a arquitetura ou implementação, consulte a documentação:
-
-- **Arquitetura:** [ARCHITECTURE.md](./ARCHITECTURE.md)
-- **Backend:** [BACKEND_CONTRACT.md](./BACKEND_CONTRACT.md)
-- **Quick Start:** [QUICKSTART.md](./QUICKSTART.md)
-
----
-
 **Desenvolvido com ❤️ usando Next.js, SignalR e Tailwind CSS**
-
-**Status:** ✅ Production Ready (após atualizar JWT token)
